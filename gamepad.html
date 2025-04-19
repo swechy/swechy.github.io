@@ -1,0 +1,757 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>手柄测试</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        margin: 0;
+        padding: 0;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        flex-direction: column;
+        height: 100vh;
+        background-color: #f4f4f9;
+        line-height: 2;
+      }
+
+      #game-container {
+        width: 600px;
+        height: 600px;
+        border: 1px solid #ccc;
+        position: relative;
+        overflow: hidden;
+        background-color: #fff;
+      }
+
+      .falling-item {
+        position: absolute;
+        width: 70px;
+        height: 35px;
+        border-radius: 10px;
+        background-color: #3498db;
+        color: white;
+        font-size: 16px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        transition: top 3s linear;
+      }
+      #BRight {
+        transform: translateX(3px);
+      }
+      #BLeft {
+        transform: translateX(-3px);
+      }
+      #BTop {
+        transform: translateY(-3px);
+      }
+      #BBottom {
+        transform: translateY(3px);
+      }
+      #score {
+        position: absolute;
+        top: 10px;
+        left: 10px;
+        font-size: 24px;
+      }
+
+      .trigger-line {
+        position: absolute;
+        bottom: 150px;
+        width: 100%;
+        height: 1px;
+        background-color: red;
+      }
+      .text-lg {
+        margin-bottom: 20px;
+      }
+      .trigger {
+        margin-top: 20px;
+        width: 350px;
+        height: 300px;
+        display: flex;
+        justify-content: space-around;
+        align-items: center;
+      }
+      .trigger-num {
+        margin-top: 20px;
+        width: 350px;
+        display: flex;
+        justify-content: space-around;
+        align-items: center;
+      }
+      .trigger-left-num,
+      .trigger-right-num {
+        width: 100px;
+        position: relative;
+        text-align: center;
+      }
+      .trigger-left,
+      .trigger-right {
+        width: 100px;
+        height: 300px;
+        border: 3px solid rgba(0, 0, 0, 1);
+        position: relative;
+      }
+      #trigger-left,
+      #trigger-right {
+        position: absolute;
+        bottom: 0;
+        background: transparent;
+        width: 100%;
+        height: 0%;
+      }
+      .flex-jc {
+        justify-content: space-between;
+        margin-bottom: 20px;
+      }
+      .selected {
+        background-color: rgba(0, 106, 255, 0.5);
+        border-color: #73a6ff;
+      }
+      .flex {
+        display: flex;
+      }
+      .hover\:bg-gray-200:hover {
+        --tw-bg-opacity: 1;
+        background-color: rgb(229 231 235 / var(--tw-bg-opacity, 1));
+      }
+
+      .p-4 {
+        padding: 0.8rem;
+      }
+
+      .border-gray-300 {
+        --tw-border-opacity: 1;
+        border-color: rgb(209 213 219 / var(--tw-border-opacity, 1));
+      }
+
+      .border {
+        border: 1px solid rgb(209 213 219 / var(--tw-border-opacity, 1));
+      }
+
+      .border {
+        border-width: 1px;
+      }
+
+      .rounded {
+        border-radius: 0.25rem;
+      }
+
+      .cursor-pointer {
+        cursor: pointer;
+      }
+      .p-4 {
+        width: 272px;
+        height: 82px;
+        text-align: center;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+    </style>
+  </head>
+
+  <body>
+    <!-- <svg t="1745031598808" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="12259" width="32" height="32"><path d="M1023.766 700.208c-5.5-125.9-113.778-410.142-118.372-422.172a21.412 21.412 0 0 0-8.124-10.156l-22.624-15v-21.89a21.3 21.3 0 0 0-15.188-20.42L702.68 163.4a21.354 21.354 0 0 0-18 2.702l-51.152 34.234H390.472l-51.154-34.234a21.354 21.354 0 0 0-18-2.702l-156.776 47.17a21.3 21.3 0 0 0-15.188 20.42v21.89l-22.624 15a21.454 21.454 0 0 0-8.124 10.156C113.982 290.066 5.734 574.308 0.234 700.208c-3.218 73.5 30.124 113.558 58.654 134.184 30.592 22.156 62.186 26.718 63.498 26.906a21.246 21.246 0 0 0 17.874-5.938c0.438-0.406 42.374-41.594 89.248-82.746 86.81-76.248 109.34-81.31 112.028-81.654h340.928c2.684 0.344 25.214 5.406 112.028 81.654 46.872 41.152 88.808 82.34 89.214 82.746a21.3 21.3 0 0 0 14.968 6.124c0.968 0 1.938-0.062 2.938-0.188 1.312-0.188 32.902-4.75 63.496-26.906 28.532-20.622 61.876-60.682 58.658-134.182z" fill="#2c2c2c" p-id="12260" data-spm-anchor-id="a313x.search_index.0.i17.2dfe3a81KSkBUW" class=""></path><path d="M276.852 392.798m-63.998 0a63.998 63.998 0 1 0 127.996 0 63.998 63.998 0 1 0-127.996 0Z" fill="#CCD1D9" p-id="12261"></path><path d="M276.852 307.472c-47.03 0-85.31 38.28-85.31 85.326 0 47.044 38.28 85.324 85.31 85.324 47.06 0 85.34-38.28 85.34-85.324 0-47.046-38.28-85.326-85.34-85.326z m0 127.996c-23.53 0-42.656-19.14-42.656-42.67 0-23.532 19.124-42.672 42.656-42.672s42.686 19.14 42.686 42.672c0 23.53-19.156 42.67-42.686 42.67z" fill="#AAB2BC" p-id="12262"></path><path d="M618.654 541.652m-63.998 0a63.998 63.998 0 1 0 127.996 0 63.998 63.998 0 1 0-127.996 0Z" fill="#CCD1D9" p-id="12263"></path><path d="M618.652 626.962c-47.032 0-85.308-38.282-85.308-85.31 0-47.06 38.278-85.326 85.308-85.326 47.062 0 85.34 38.264 85.34 85.326 0 47.03-38.278 85.31-85.34 85.31z m0-127.98c-23.532 0-42.656 19.14-42.656 42.67 0 23.532 19.124 42.654 42.656 42.654s42.688-19.124 42.688-42.654c0-23.528-19.156-42.67-42.688-42.67z" fill="#AAB2BC" p-id="12264"></path><path d="M405.348 605.65c-11.782 0-21.344-9.562-21.344-21.344v-85.324c0-11.782 9.562-21.328 21.344-21.328 11.78 0 21.312 9.546 21.312 21.328v85.324c0 11.782-9.532 21.344-21.312 21.344z" fill="#CCD1D9" p-id="12265"></path><path d="M448.002 562.964h-85.34c-11.782 0-21.312-9.532-21.312-21.312s9.53-21.326 21.312-21.326h85.34c11.782 0 21.344 9.544 21.344 21.326s-9.562 21.312-21.344 21.312z" fill="#CCD1D9" p-id="12266"></path><path d="M740.398 292.614c8.344 8.344 8.344 21.844 0 30.172-8.312 8.344-21.844 8.344-30.156 0-8.344-8.328-8.344-21.828 0-30.172 8.312-8.328 21.844-8.328 30.156 0z" fill="#FFCE54" p-id="12267"></path><path d="M740.398 420.14c8.344 8.328 8.344 21.844 0 30.172-8.312 8.328-21.844 8.328-30.156 0-8.344-8.328-8.344-21.844 0-30.172 8.312-8.328 21.844-8.328 30.156 0z" fill="#A0D468" p-id="12268"></path><path d="M804.394 356.142c8.344 8.328 8.344 21.844 0 30.172-8.308 8.328-21.84 8.328-30.152 0-8.344-8.328-8.344-21.844 0-30.172 8.312-8.328 21.844-8.328 30.152 0z" fill="#ED5564" p-id="12269"></path><path d="M676.402 356.142c8.34 8.328 8.34 21.844 0 30.172-8.312 8.328-21.844 8.328-30.156 0-8.344-8.328-8.344-21.844 0-30.172 8.312-8.328 21.844-8.328 30.156 0z" fill="#5D9CEC" p-id="12270"></path><path d="M390.472 200.336l36.188 85.31h170.68l36.188-85.31z" fill="#2c2c2c" p-id="12271" data-spm-anchor-id="a313x.search_index.0.i18.2dfe3a81KSkBUW" class=""></path></svg> -->
+    <div class="flex flex-jc">
+      <div
+        id="gamepad0"
+        style="margin-right: 20px"
+        class="p-4 border border-gray-300 rounded cursor-pointer hover:bg-gray-200"
+        onclick="selectGamepad(this, 0)"
+      >
+        手柄 1<br />
+        未连接
+      </div>
+      <div
+        id="gamepad1"
+        style="margin-right: 20px"
+        class="p-4 border border-gray-300 rounded cursor-pointer hover:bg-gray-200"
+        onclick="selectGamepad(this, 1)"
+      >
+        手柄 2<br />
+        未连接
+      </div>
+      <div
+        id="gamepad2"
+        style="margin-right: 20px"
+        class="p-4 border border-gray-300 rounded cursor-pointer hover:bg-gray-200"
+        onclick="selectGamepad(this, 2)"
+      >
+        手柄 3<br />
+        未连接
+      </div>
+      <div
+        id="gamepad3"
+        class="p-4 border border-gray-300 rounded cursor-pointer hover:bg-gray-200"
+        onclick="selectGamepad(this, 3)"
+      >
+        手柄 4<br />
+        未连接
+      </div>
+    </div>
+    <svg
+      width="350"
+      viewBox="0 0 441 383"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <g id="XBox">
+        <path
+          id="LOutline"
+          d="M220.5 294.5C220.5 294.5 195 294.5 150 294.5C105 294.5 81.5 378.5 49.5 378.5C17.5 378.5 4 363.9 4 317.5C4 271.1 43.5 165.5 55 137.5C66.5 109.5 95.5 92.0001 128 92.0001C154 92.0001 200.5 92.0001 220.5 92.0001"
+          stroke="#333"
+          stroke-width="3"
+          stroke-opacity="1"
+        ></path>
+        <path
+          id="ROutline"
+          d="M220 294.5C220 294.5 245.5 294.5 290.5 294.5C335.5 294.5 359 378.5 391 378.5C423 378.5 436.5 363.9 436.5 317.5C436.5 271.1 397 165.5 385.5 137.5C374 109.5 345 92.0001 312.5 92.0001C286.5 92.0001 240 92.0001 220 92.0001"
+          stroke="#333"
+          stroke-width="3"
+          stroke-opacity="1"
+        ></path>
+        <circle
+          id="LStickOutline"
+          cx="113"
+          cy="160"
+          r="37.5"
+          stroke="#333"
+          stroke-opacity="1"
+          stroke-width="3"
+        ></circle>
+        <circle
+          id="LeftStick"
+          cx="113.00018310826276"
+          cy="159.99981689173723"
+          r="28"
+          fill="rgba(0,0,0,0)"
+          stroke="rgba(0,0,0,1)"
+          stroke-width="3"
+        ></circle>
+        <circle
+          id="RStickOutline"
+          cx="278"
+          cy="238"
+          r="37.5"
+          stroke="#333"
+          stroke-opacity="1"
+          stroke-width="3"
+        ></circle>
+        <circle
+          id="RightStick"
+          cx="278.0001831082628"
+          cy="237.99981689173723"
+          r="28"
+          fill="rgba(0,0,0,0)"
+          stroke="rgba(0,0,0,1)"
+          stroke-width="3"
+        ></circle>
+        <circle
+          id="DOutline"
+          cx="166"
+          cy="238"
+          r="37.5"
+          stroke="#333"
+          stroke-opacity="1"
+          stroke-width="3"
+        ></circle>
+        <g>
+          <path
+            id="DUp"
+            stroke="rgba(0,0,0,1)"
+            stroke-width="3"
+            d="M177.669 222.335C180.793 219.21 180.816 213.997 176.868 212.014C176.327 211.743 175.776 211.491 175.215 211.258C172.182 210.002 168.931 209.355 165.648 209.355C162.365 209.355 159.114 210.002 156.081 211.258C155.521 211.491 154.969 211.743 154.429 212.014C150.48 213.997 150.503 219.21 153.627 222.335L159.991 228.698C163.116 231.823 168.181 231.823 171.305 228.698L177.669 222.335Z"
+          ></path>
+        </g>
+        <g>
+          <path
+            id="DRight"
+            stroke="rgba(0,0,0,1)"
+            stroke-width="3"
+            d="M181.447 249.669C184.571 252.793 189.785 252.816 191.768 248.868C192.039 248.327 192.291 247.776 192.523 247.215C193.78 244.182 194.426 240.931 194.426 237.648C194.426 234.365 193.78 231.114 192.523 228.081C192.291 227.521 192.039 226.969 191.768 226.429C189.785 222.48 184.571 222.503 181.447 225.627L175.083 231.991C171.959 235.116 171.959 240.181 175.083 243.305L181.447 249.669Z"
+          ></path>
+        </g>
+        <g>
+          <path
+            id="DDown"
+            stroke="rgba(0,0,0,1)"
+            stroke-width="3"
+            d="M154.113 253.447C150.989 256.571 150.966 261.785 154.914 263.767C155.455 264.039 156.006 264.291 156.566 264.523C159.6 265.78 162.85 266.426 166.134 266.426C169.417 266.426 172.667 265.78 175.701 264.523C176.261 264.291 176.812 264.039 177.353 263.767C181.301 261.785 181.279 256.571 178.154 253.447L171.79 247.083C168.666 243.959 163.601 243.959 160.477 247.083L154.113 253.447Z"
+          ></path>
+        </g>
+        <g>
+          <path
+            id="DLeft"
+            stroke="rgba(0,0,0,1)"
+            stroke-width="3"
+            d="M150.335 226.113C147.21 222.989 141.997 222.966 140.014 226.914C139.743 227.455 139.491 228.006 139.258 228.566C138.002 231.6 137.355 234.85 137.355 238.134C137.355 241.417 138.002 244.667 139.258 247.701C139.491 248.261 139.743 248.812 140.014 249.353C141.997 253.301 147.21 253.279 150.335 250.154L156.698 243.79C159.823 240.666 159.823 235.601 156.698 232.477L150.335 226.113Z"
+          ></path>
+        </g>
+        <g>
+          <path
+            id="BTop"
+            stroke-width="3"
+            opacity="undefined"
+            transform="rotate(90 329.081 140.331)"
+            fill="#fff"
+            stroke="rgba(0,0,0,1)"
+            d="m329.08146,150.33176c-5.57089,0 -10.08331,-4.52112 -10.08331,-10.10275c0,-5.58163 4.51242,-9.89721 10.08331,-9.89721c5.57089,0 10.08331,4.31558 10.08331,9.89721c0,5.58163 -4.51242,10.10275 -10.08331,10.10275z"
+          ></path>
+        </g>
+        <g>
+          <path
+            id="BRight"
+            stroke-width="3"
+            opacity="undefined"
+            transform="rotate(90 348.415 161.332)"
+            fill="#fff"
+            stroke="rgba(0, 0, 0,1)"
+            d="m348.41497,171.33195c-5.57089,0 -10.08331,-4.52112 -10.08331,-10.10275c0,-5.58163 4.51242,-9.89721 10.08331,-9.89721c5.57089,0 10.08331,4.31558 10.08331,9.89721c0,5.58163 -4.51242,10.10275 -10.08331,10.10275z"
+            data-v-d6ef606e=""
+          ></path>
+        </g>
+        <g>
+          <path
+            id="BBottom"
+            stroke-width="3"
+            opacity="undefined"
+            transform="rotate(90 330.081 180.665)"
+            fill="#fff"
+            stroke="rgba(0, 0, 0,1)"
+            d="m330.08147,190.66546c-5.57089,0 -10.08331,-4.52112 -10.08331,-10.10275c0,-5.58163 4.51242,-9.8972 10.08331,-9.8972c5.57089,0 10.08331,4.31557 10.08331,9.8972c0,5.58163 -4.51242,10.10275 -10.08331,10.10275z"
+            data-v-d6ef606e=""
+          ></path>
+        </g>
+        <g>
+          <path
+            id="BLeft"
+            stroke-width="3"
+            opacity="undefined"
+            transform="rotate(90 310.081 161.999)"
+            fill="#fff"
+            stroke="rgba(0, 0, 0,1)"
+            d="m310.08129,171.99862c-5.57089,0 -10.08331,-4.52112 -10.08331,-10.10275c0,-5.58163 4.51242,-9.89721 10.08331,-9.89721c5.57089,0 10.08331,4.31558 10.08331,9.89721c0,5.58163 -4.51242,10.10275 -10.08331,10.10275z"
+            data-v-d6ef606e=""
+          ></path>
+        </g>
+        <g>
+          <rect
+            id="LMeta"
+            width="30"
+            height="13"
+            x="175"
+            y="152"
+            r="10"
+            fill="rgba(0,0,0,0)"
+            stroke="rgba(0,0,0,1)"
+            stroke-width="3"
+            rx="6.5"
+          ></rect>
+        </g>
+        <g>
+          <rect
+            id="RMeta"
+            width="30"
+            height="13"
+            x="240"
+            y="152"
+            r="10"
+            fill="rgba(0,0,0,0)"
+            stroke="rgba(0,0,0,1)"
+            stroke-width="3"
+            rx="6.5"
+          ></rect>
+          <!-- <circle
+            cx="259"
+            cy="162"
+            r="10"
+            fill="rgba(0,0,0,0)"
+            stroke="rgba(0,0,0,1)"
+            stroke-width="3"
+          ></circle> -->
+        </g>
+        <rect
+          id="L1"
+          x="111.5"
+          y="59.5"
+          width="41"
+          height="18"
+          rx="6.5"
+          fill="rgba(0,0,0,0)"
+          stroke="rgba(0,0,0,1)"
+          stroke-width="3"
+        ></rect>
+        <rect
+          id="R1"
+          x="289.5"
+          y="59.5"
+          width="41"
+          height="18"
+          rx="6.5"
+          fill="rgba(0,0,0,0)"
+          stroke="rgba(0,0,0,1)"
+          stroke-width="3"
+        ></rect>
+        <path
+          id="L2"
+          d="M152.5 37C152.5 41.1421 149.142 44.5 145 44.5H132C127.858 44.5 124.5 41.1421 124.5 37V16.5C124.5 8.76801 130.768 2.5 138.5 2.5C146.232 2.5 152.5 8.76801 152.5 16.5V37Z"
+          fill="rgba(0,0,0,0)"
+          stroke="rgba(0,0,0,1)"
+          stroke-width="3"
+        ></path>
+        <path
+          id="R2"
+          d="M317.5 37C317.5 41.1421 314.142 44.5 310 44.5H297C292.858 44.5 289.5 41.1421 289.5 37V16.5C289.5 8.76801 295.768 2.5 303.5 2.5C311.232 2.5 317.5 8.76801 317.5 16.5V37Z"
+          fill="rgba(0,0,0,0)"
+          stroke="rgba(0,0,0,1)"
+          stroke-width="3"
+        ></path>
+      </g>
+    </svg>
+    <div class="trigger">
+      <div class="trigger-left">
+        <div id="trigger-left"></div>
+      </div>
+      <div class="trigger-right">
+        <div id="trigger-right"></div>
+      </div>
+    </div>
+    <div class="trigger-num">
+      <div id="trigger-left-num" class="trigger-left-num">0</div>
+      <div id="trigger-right-num" class="trigger-right-num">0</div>
+    </div>
+    <script>
+      let gamepad;
+      let gpindex = 0;
+      let inputStartTime;
+
+      function selectGamepad(selectedDiv, i) {
+        const gamepads = document.querySelectorAll('[id^="gamepad"]');
+        gamepads.forEach((gamepad) => {
+          gamepad.classList.remove("selected");
+        });
+        selectedDiv.classList.add("selected");
+        gpindex = i;
+        gamepad = navigator.getGamepads()[i];
+      }
+      // 监听手柄连接事件
+      window.addEventListener("gamepadconnected", (event) => {
+        const gamepads = navigator.getGamepads();
+        console.log(gamepads);
+        for (let i = 0; i < gamepads.length; i++) {
+          if (gamepads[i]) {
+            document.getElementById("gamepad" + i).innerText = gamepads[i].id;
+            document.getElementById("gamepad" + i).classList.toggle("selected");
+            gpindex = i;
+          }
+        }
+        gamepad = event.gamepad;
+        console.log(gamepad);
+        // const statusElement = document.getElementById("status");
+        // statusElement.textContent = `手柄已连接: ${gamepad.id}`;
+        requestAnimationFrame(checkGamepadInput);
+      });
+
+      // 监听手柄断开连接事件
+      window.addEventListener("gamepaddisconnected", (event) => {
+        gamepad = null;
+        const gamepads = navigator.getGamepads();
+        console.log(gamepads);
+        for (let i = 0; i < gamepads.length; i++) {
+          if (gamepads[i]) {
+            document.getElementById("gamepad" + i).innerText = gamepads[i].id;
+            document.getElementById("gamepad" + i).classList.toggle("selected");
+            gpindex = i;
+          } else {
+            document.getElementById("gamepad" + i).innerHTML =
+              "手柄" + (i + 1) + "<br/>未连接";
+            if (
+              document
+                .getElementById("gamepad" + i)
+                .classList.contains("selected")
+            ) {
+              document
+                .getElementById("gamepad" + i)
+                .classList.toggle("selected");
+            }
+          }
+        }
+        gamepad = event.gamepad;
+        // const statusElement = document.getElementById("status");
+        // statusElement.textContent = "手柄已断开连接，请重新连接。";
+      });
+      var a = [];
+      function calculateAverage(arr) {
+        if (arr.length === 0) {
+          return 0;
+        }
+        let sum = 0;
+        for (let i = 0; i < arr.length; i++) {
+          sum += arr[i];
+        }
+        return sum / arr.length;
+      }
+      // 检查手柄输入
+      let axess = [];
+      function checkGamepadInput() {
+        try {
+          if (gamepad) {
+            const gamepads = navigator.getGamepads();
+            // console.log(gamepads[0].index)
+            gamepad = gamepads[gpindex];
+            // if (JSON.stringify(axess) !== JSON.stringify(gamepad.axes)) {
+            axess = gamepad.axes;
+            let lStickAmt = Math.max(
+              0,
+              1.2 *
+                Math.sqrt(
+                  Math.pow(gamepad.axes[0], 2) + Math.pow(gamepad.axes[1], 2)
+                ) -
+                0.2
+            );
+            let lightStroke = Math.max(
+              0,
+              1.2 *
+                Math.sqrt(
+                  Math.pow(gamepad.axes[2], 2) + Math.pow(gamepad.axes[3], 2)
+                ) -
+                0.2
+            );
+            if (lStickAmt) {
+              document
+                .getElementById("LeftStick")
+                .setAttribute("cx", 113 + 12 * gamepad.axes[0]);
+              document
+                .getElementById("LeftStick")
+                .setAttribute("cy", 160 + 12 * gamepad.axes[1]);
+              document
+                .getElementById("LeftStick")
+                .setAttribute("fill", "rgba(0, 106, 255, " + lStickAmt + ")");
+            }
+            if (lightStroke) {
+              document
+                .getElementById("RightStick")
+                .setAttribute("cx", 278 + 12 * gamepad.axes[2]);
+              document
+                .getElementById("RightStick")
+                .setAttribute("cy", 237 + 12 * gamepad.axes[3]);
+              document
+                .getElementById("RightStick")
+                .setAttribute("fill", "rgba(0, 106, 255, " + lightStroke + ")");
+            }
+            // }
+            for (let i = 0; i < gamepad.buttons.length; i++) {
+              const button = gamepad.buttons[i];
+              if (button.pressed) {
+                switch (i) {
+                  case 0:
+                    document
+                      .getElementById("BBottom")
+                      .setAttribute("fill", "rgba(0, 106, 255, 0.7)");
+                    break;
+                  case 1:
+                    document
+                      .getElementById("BRight")
+                      .setAttribute("fill", "rgba(0, 106, 255, 0.7)");
+                    break;
+                  case 2:
+                    document
+                      .getElementById("BLeft")
+                      .setAttribute("fill", "rgba(0, 106, 255, 0.7)");
+                    break;
+                  case 3:
+                    document
+                      .getElementById("BTop")
+                      .setAttribute("fill", "rgba(0, 106, 255, 0.7)");
+                    break;
+                  case 4:
+                    document
+                      .getElementById("L1")
+                      .setAttribute("fill", "rgba(0, 106, 255, 0.7)");
+                    break;
+                  case 5:
+                    document
+                      .getElementById("R1")
+                      .setAttribute("fill", "rgba(0, 106, 255, 0.7)");
+                    break;
+                  case 6:
+                    document
+                      .getElementById("L2")
+                      .setAttribute(
+                        "fill",
+                        "rgba(0, 106, 255, " + button.value + ")"
+                      );
+                    break;
+                  case 7:
+                    document
+                      .getElementById("R2")
+                      .setAttribute(
+                        "fill",
+                        "rgba(0, 106, 255, " + button.value + ")"
+                      );
+                    break;
+                  case 8:
+                    document
+                      .getElementById("LMeta")
+                      .setAttribute("fill", "rgba(0, 106, 255, 0.7)");
+                    break;
+                  case 9:
+                    document
+                      .getElementById("RMeta")
+                      .setAttribute("fill", "rgba(0, 106, 255, 0.7)");
+                    break;
+                  case 10:
+                    document
+                      .getElementById("LeftStick")
+                      .setAttribute("fill", "rgba(0, 106, 255, 0.7)");
+                    break;
+                  case 11:
+                    document
+                      .getElementById("RightStick")
+                      .setAttribute("fill", "rgba(0, 106, 255, 0.7)");
+                    break;
+                  case 12:
+                    document
+                      .getElementById("DUp")
+                      .setAttribute("fill", "rgba(0, 106, 255, 0.7)");
+                    break;
+                  case 13:
+                    document
+                      .getElementById("DDown")
+                      .setAttribute("fill", "rgba(0, 106, 255, 0.7)");
+                    break;
+                  case 14:
+                    document
+                      .getElementById("DLeft")
+                      .setAttribute("fill", "rgba(0, 106, 255, 0.7)");
+                    break;
+                  case 15:
+                    document
+                      .getElementById("DRight")
+                      .setAttribute("fill", "rgba(0, 106, 255, 0.7)");
+                    break;
+                  default:
+                    break;
+                }
+              }
+            }
+
+            setTimeout(() => {
+              document
+                .getElementById("BBottom")
+                .setAttribute("fill", "rgba(0,0,0,0)");
+              document
+                .getElementById("BRight")
+                .setAttribute("fill", "rgba(0,0,0,0)");
+              document
+                .getElementById("BLeft")
+                .setAttribute("fill", "rgba(0,0,0,0)");
+              document
+                .getElementById("BTop")
+                .setAttribute("fill", "rgba(0,0,0,0)");
+              document
+                .getElementById("L1")
+                .setAttribute("fill", "rgba(0,0,0,0)");
+              document
+                .getElementById("R1")
+                .setAttribute("fill", "rgba(0,0,0,0)");
+              document
+                .getElementById("L2")
+                .setAttribute("fill", "rgba(0,0,0,0)");
+              document
+                .getElementById("R2")
+                .setAttribute("fill", "rgba(0,0,0,0)");
+              document
+                .getElementById("LMeta")
+                .setAttribute("fill", "rgba(0,0,0,0)");
+              document
+                .getElementById("RMeta")
+                .setAttribute("fill", "rgba(0,0,0,0)");
+              document
+                .getElementById("DUp")
+                .setAttribute("fill", "rgba(0,0,0,0)");
+              document
+                .getElementById("DDown")
+                .setAttribute("fill", "rgba(0,0,0,0)");
+              document
+                .getElementById("DLeft")
+                .setAttribute("fill", "rgba(0,0,0,0)");
+              document
+                .getElementById("DRight")
+                .setAttribute("fill", "rgba(0,0,0,0)");
+              document
+                .getElementById("LeftStick")
+                .setAttribute("fill", "rgba(0,0,0,0)");
+              document
+                .getElementById("RightStick")
+                .setAttribute("fill", "rgba(0,0,0,0)");
+              if (!lStickAmt) {
+                document
+                  .getElementById("LeftStick")
+                  .setAttribute("cx", 113 + 12 * gamepad.axes[0]);
+                document
+                  .getElementById("LeftStick")
+                  .setAttribute("cy", 160 + 12 * gamepad.axes[1]);
+                document
+                  .getElementById("LeftStick")
+                  .setAttribute("fill", "rgba(0, 106, 255, " + 0 + ")");
+              }
+              if (!lightStroke) {
+                document
+                  .getElementById("RightStick")
+                  .setAttribute("cx", 278 + 12 * gamepad.axes[2]);
+                document
+                  .getElementById("RightStick")
+                  .setAttribute("cy", 237 + 12 * gamepad.axes[3]);
+                document
+                  .getElementById("RightStick")
+                  .setAttribute("fill", "rgba(0, 106, 255, " + 0 + ")");
+              }
+            }, 1);
+          }
+          if (gamepad.vibrationActuator) {
+            // 通常左扳机对应 buttons[6]，右扳机对应 buttons[7]
+            const leftTriggerValue = gamepad.buttons[6].value;
+            const rightTriggerValue = gamepad.buttons[7].value;
+            document.getElementById("trigger-left").style.height = `${
+              leftTriggerValue * 100
+            }%`;
+            document.getElementById("trigger-left").style.background =
+              "rgba(0, 106, 255, " + leftTriggerValue + ")";
+            document.getElementById("trigger-left-num").innerText = Math.round(
+              leftTriggerValue * 255
+            );
+            document.getElementById("trigger-right").style.height = `${
+              rightTriggerValue * 100
+            }%`;
+            document.getElementById("trigger-right").style.background =
+              "rgba(0, 106, 255, " + rightTriggerValue + ")";
+            document.getElementById("trigger-right-num").innerText = Math.round(
+              rightTriggerValue * 255
+            );
+            gamepad.vibrationActuator
+              .playEffect("dual-rumble", {
+                startDelay: 0,
+                duration: 50, // 震动持续时间
+                weakMagnitude: rightTriggerValue,
+                strongMagnitude: leftTriggerValue,
+              })
+              .catch((error) => {
+                console.error("震动效果播放失败:", error);
+              });
+          }
+
+          requestAnimationFrame(checkGamepadInput);
+        } catch (error) {
+          requestAnimationFrame(checkGamepadInput);
+        }
+      }
+    </script>
+  </body>
+</html>
